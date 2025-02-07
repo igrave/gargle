@@ -91,7 +91,7 @@ oauth_gha_token <- function(project_id,
                             universe = "googleapis.com",
                             id_token_url = Sys.getenv("ACTIONS_ID_TOKEN_REQUEST_URL"),
                             id_token_request_token = Sys.getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")) {
-  if (!id_token_url == "" || !id_token_request_token == "") {
+  if (id_token_url == "" || id_token_request_token == "") {
     gargle_abort(paste0(
      "GitHub Actions did not inject $ACTIONS_ID_TOKEN_REQUEST_TOKEN or ",
      "$ACTIONS_ID_TOKEN_REQUEST_URL into this job. This most likely means the ",
