@@ -109,8 +109,6 @@ oauth_gha_token <- function(project_id,
   )
   endpoints <- sub("{universe}", universe, endpoints, fixed = TRUE)
   
-  paste0("//", parse_url(oidcTokenAudience)$hostname, "/", workload_identity_provider)
-
   params <- list(
     scopes = scopes,
     project_id = project_id,
