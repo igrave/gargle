@@ -127,7 +127,6 @@ oauth_gha_token <- function(project_id,
 }
 
 
-
 detect_github_actions <- function() {
   if (Sys.getenv("GITHUB_ACTIONS") == "true") {
     return(TRUE)
