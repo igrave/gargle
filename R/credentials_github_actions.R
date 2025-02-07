@@ -179,7 +179,9 @@ gha_subject_token <- function(params) {
     method = "GET",
     url = params$id_token_url,
     query = list(audience = params$audience),
-    add_headers(Authorization = paste0("Bearer ", id_token_request_token))  
+    token = httr::add_headers(
+      Authorization = paste("Bearer", params$id_token_request_token)
+    )  
   )
   
   resp <- request_make(req)
