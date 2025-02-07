@@ -177,7 +177,7 @@ init_oauth_external_account <- function(params) {
 
 gha_subject_token <- function(params) {
 
-  audience <- paste0("//", parse_url(params$audience)$hostname, "/", params$workload_identity_provider)
+  audience <- paste0("//", httr::parse_url(params$audience)$hostname, "/", params$workload_identity_provider)
 
   req <- list(
     method = "GET",
