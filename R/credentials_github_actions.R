@@ -49,7 +49,7 @@
 credentials_github_actions <- function(project_id,
   workload_identity_provider,
   service_account,
-  lifetime,
+  lifetime = "300s",
   scopes = "https://www.googleapis.com/auth/drive.file",
                                          ...) {
   gargle_debug("trying {.fun credentials_external_account}")
@@ -59,7 +59,14 @@ credentials_github_actions <- function(project_id,
 
   scopes <- normalize_scopes(add_email_scope(scopes))
 
-  token <- oauth_gha_token(path = path, scopes = scopes)
+  token <- oauth_gha_token(
+    project_id = project_id,
+    workload_identity_provider = workload_identity_provider,
+    service_account = service_account,
+    lifetime = lifetime,
+    path = path,
+    scopes = scopes, 
+    ...)
 
   if (is.null(token$credentials$access_token) ||
     !nzchar(token$credentials$access_token)) {
