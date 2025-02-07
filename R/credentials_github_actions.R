@@ -121,7 +121,8 @@ oauth_gha_token <- function(project_id,
     endpoints = endpoints,
     service_account = service_account,
     token_url = paste0(endpoints[["sts"]], "/token"),
-    audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
+    audience = paste0("//", httr::parse_url(params$audience)$hostname, "/", params$workload_identity_provider),
+    oidc_token_audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
     subject_token_type = "urn:ietf:params:oauth:token-type:jwt",
     impersonation_url = paste0(endpoints[["iamcredentials"]], "/projects/-/serviceAccounts/", service_account,":generateAccessToken"),
     # the most pragmatic way to get super$sign() to work
@@ -175,12 +176,12 @@ init_oauth_external_account <- function(params) {
 
 gha_subject_token <- function(params) {
 
-  audience <- paste0("//", httr::parse_url(params$audience)$hostname, "/", params$workload_identity_provider)
+  
 
   req <- list(
     method = "GET",
     url = params$id_token_url,
-    query = list(audience = audience),
+    query = list(audience = oidc_token_audience),
     token = httr::add_headers(
       Authorization = paste("Bearer", params$id_token_request_token)
     )  
