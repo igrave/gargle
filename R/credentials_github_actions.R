@@ -64,7 +64,6 @@ credentials_github_actions <- function(project_id,
     workload_identity_provider = workload_identity_provider,
     service_account = service_account,
     lifetime = lifetime,
-    path = path,
     scopes = scopes, 
     ...)
 
