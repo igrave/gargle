@@ -109,6 +109,8 @@ oauth_gha_token <- function(project_id,
   )
   endpoints <- sub("{universe}", universe, endpoints, fixed = TRUE)
   
+  paste0("//", parse_url(oidcTokenAudience)$hostname, "/", workload_identity_provider)
+
   params <- list(
     scopes = scopes,
     project_id = project_id,
@@ -175,10 +177,12 @@ init_oauth_external_account <- function(params) {
 
 gha_subject_token <- function(params) {
 
+  audience <- paste0("//", parse_url(params$audience)$hostname, "/", params$workload_identity_provider)
+
   req <- list(
     method = "GET",
     url = params$id_token_url,
-    query = list(audience = params$audience),
+    query = list(audience = audience),
     token = httr::add_headers(
       Authorization = paste("Bearer", params$id_token_request_token)
     )  
