@@ -176,12 +176,10 @@ init_oauth_external_account <- function(params) {
 
 gha_subject_token <- function(params) {
 
-  
-
   req <- list(
     method = "GET",
     url = params$id_token_url,
-    query = list(audience = oidc_token_audience),
+    query = list(audience = params[["oidc_token_audience"]]),
     token = httr::add_headers(
       Authorization = paste("Bearer", params$id_token_request_token)
     )  
