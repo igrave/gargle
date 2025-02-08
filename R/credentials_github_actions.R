@@ -52,7 +52,7 @@ credentials_github_actions <- function(project_id,
   lifetime = "300s",
   scopes = "https://www.googleapis.com/auth/drive.file",
                                          ...) {
-  gargle_debug("trying {.fun credentials_external_account}")
+  gargle_debug("trying {.fun credentials_github_actions}")
   if (!detect_github_actions() || is.null(scopes)) {
     return(NULL)
   }
