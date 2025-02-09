@@ -113,7 +113,7 @@ oauth_gha_token <- function(project_id,
   hardcode_aud <- "//iam.googleapis.com/projects/1073903696751/locations/global/workloadIdentityPools/github/providers/my-repo"
 
   params <- list(
-    scope = scopes,
+    scopes = scopes, # this is $scopes but WifToken$new() copies it to $scope
     project_id = project_id,
     workload_identity_provider = workload_identity_provider,
     lifetime = lifetime,
