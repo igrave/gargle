@@ -24,7 +24,12 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' credentials_github_actions()
+#' credentials_github_actions(
+#'   project_id = "project-id-12345",
+#'   workload_identity_provider = "projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider"
+#'   service_account = "my-service-account@my-project.iam.gserviceaccount.com",
+#'   scopes = "https://www.googleapis.com/auth/drive.file"
+#' )
 #' }
 credentials_github_actions <- function(
     project_id,
