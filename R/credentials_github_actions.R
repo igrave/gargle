@@ -213,7 +213,7 @@ gha_subject_token <- function(params) {
   req <- list(
     method = "GET",
     url = url,
-    query =  lapply(query, URLencode),
+    query =  query,
     token = token_header
   )
   print(req)
