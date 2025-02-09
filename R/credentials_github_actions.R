@@ -60,7 +60,6 @@ credentials_github_actions <- function(
 
   scopes <- normalize_scopes(add_email_scope(scopes))
 
-
   token <- oauth_gha_token(
     project_id = project_id,
     workload_identity_provider = workload_identity_provider,
@@ -113,11 +112,7 @@ oauth_gha_token <- function(project_id,
     audience = paste0("//iam.googleapis.com/", workload_identity_provider),
     oidc_token_audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
     subject_token_type = "urn:ietf:params:oauth:token-type:jwt",
-    service_account_impersonation_url = paste0("https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/", service_account, ":generateAccessToken"),
-    # the most pragmatic way to get super$sign() to work
-    # can't implement my own method without needing unexported httr functions
-    # request() or build_request()
-    as_header = TRUE
+    service_account_impersonation_url = paste0("https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/", service_account, ":generateAccessToken")
   )
   WifToken$new(params = params)
 }
@@ -130,36 +125,6 @@ detect_github_actions <- function() {
   gargle_debug("
     Environment variable GITHUB_ACTIONS is not 'true'")
   FALSE
-}
-
-init_oauth_external_account <- function(params) {
-  if (params$github_actions) {
-    serialized_subject_token <- gha_subject_token(params)
-  } else {
-    credential_source <- params$credential_source
-    if (!identical(credential_source$environment_id, "aws1")) {
-      gargle_abort("
-       {.pkg gargle}'s workload identity federation flow only supports AWS at \\
-       this time.")
-    }
-    subject_token <- aws_subject_token(
-      credential_source = credential_source,
-      audience = params$audience
-    )
-    serialized_subject_token <- serialize_subject_token(subject_token)
-  }
-
-  federated_access_token <- fetch_federated_access_token(
-    params = params,
-    subject_token = serialized_subject_token
-  )
-
-  fetch_wif_access_token(
-    federated_access_token,
-    impersonation_url = params[["service_account_impersonation_url"]],
-    scope = params[["scope"]],
-    lifetime = params[["lifetime"]]
-  )
 }
 
 gha_subject_token <- function(params) {
