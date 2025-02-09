@@ -357,6 +357,8 @@ serialize_subject_token <- function(x) {
 # https://cloud.google.com/iam/docs/reference/credentials/rest/v1/projects.serviceAccounts/generateAccessToken#authorization-scopes
 fetch_federated_access_token <- function(params,
                                          subject_token) {
+  print("fetch_federated_access_token")
+  print(req)
   req <- list(
     method = "POST",
     url = params$token_url,
@@ -369,7 +371,7 @@ fetch_federated_access_token <- function(params,
       # https://www.googleapis.com/auth/iam
       # I am hard-wiring the iam scope, guided by the least privilege principle,
       # as it is the narrower of the 2 scopes
-      scope = "https://www.googleapis.com/auth/iam",
+      scope = "https://www.googleapis.com/auth/cloud-platform", #iam",
       subjectTokenType = params[["subject_token_type"]],
       subjectToken = subject_token
     )
