@@ -188,11 +188,11 @@ fetch_federated_access_token2 <- function(params, subject_token) {
   authtoken <- httr::POST(
     url = params$token_url,
     body = list(
-      audience = paste0("//", httr::parse_url(params$oidc_token_audience)$hostname, "/", params$workload_identity_provider),
+      audience = params[["audience"]],
       grantType = "urn:ietf:params:oauth:grant-type:token-exchange",
       requestedTokenType = "urn:ietf:params:oauth:token-type:access_token",
       scope = paste0(params$endpoints[["www"]], "/auth/cloud-platform"),
-      subjectTokenType = "urn:ietf:params:oauth:token-type:jwt",
+      subjectTokenType = params[["subject_token_type"]],
       subjectToken = subject_token
     ),
     encode = "json"
