@@ -46,12 +46,13 @@
 #' \dontrun{
 #' credentials_github_actions()
 #' }
-credentials_github_actions <- function(project_id,
-  workload_identity_provider,
-  service_account,
-  lifetime = "300s",
-  scopes = "https://www.googleapis.com/auth/drive.file",
-                                         ...) {
+credentials_github_actions <- function(
+    project_id,
+    workload_identity_provider,
+    service_account,
+    lifetime = "300s",
+    scopes = "https://www.googleapis.com/auth/drive.file",
+    ...) {
   gargle_debug("trying {.fun credentials_github_actions}")
   if (!detect_github_actions() || is.null(scopes)) {
     return(NULL)
@@ -65,8 +66,9 @@ credentials_github_actions <- function(project_id,
     workload_identity_provider = workload_identity_provider,
     service_account = service_account,
     lifetime = lifetime,
-    scopes = scopes, 
-    ...)
+    scopes = scopes,
+    ...
+  )
 
   if (is.null(token$credentials$access_token) ||
     !nzchar(token$credentials$access_token)) {
@@ -94,22 +96,23 @@ oauth_gha_token <- function(project_id,
                             id_token_request_token = Sys.getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")) {
   if (id_token_url == "" || id_token_request_token == "") {
     gargle_abort(paste0(
-     "GitHub Actions did not inject $ACTIONS_ID_TOKEN_REQUEST_TOKEN or ",
-     "$ACTIONS_ID_TOKEN_REQUEST_URL into this job. This most likely means the ",
-     "GitHub Actions workflow permissions are incorrect, or this job is being ",
-     "run from a fork. For more information, please see ",
-     "https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token"))
+      "GitHub Actions did not inject $ACTIONS_ID_TOKEN_REQUEST_TOKEN or ",
+      "$ACTIONS_ID_TOKEN_REQUEST_URL into this job. This most likely means the ",
+      "GitHub Actions workflow permissions are incorrect, or this job is being ",
+      "run from a fork. For more information, please see ",
+      "https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token"
+    ))
   }
 
   endpoints <- c(
-     iam = "https://iam.{universe}/v1",
-     iamcredentials = "https://iamcredentials.{universe}/v1",
-     oauth2 = "https://oauth2.{universe}",
-     sts = "https://sts.{universe}/v1",
-     www = "https://www.{universe}"
+    iam = "https://iam.{universe}/v1",
+    iamcredentials = "https://iamcredentials.{universe}/v1",
+    oauth2 = "https://oauth2.{universe}",
+    sts = "https://sts.{universe}/v1",
+    www = "https://www.{universe}"
   )
   endpoints <- sub("{universe}", universe, endpoints, fixed = TRUE)
-  
+
   hardcode_aud <- "//iam.googleapis.com/projects/1073903696751/locations/global/workloadIdentityPools/github/providers/my-repo"
 
   params <- list(
@@ -124,11 +127,11 @@ oauth_gha_token <- function(project_id,
     endpoints = endpoints,
     service_account = service_account,
     token_url = paste0(endpoints[["sts"]], "/token"),
-    audience = hardcode_aud, 
+    audience = hardcode_aud,
     # audience = paste0("//", httr::parse_url(endpoints[["iam"]])$hostname, "/", workload_identity_provider),
     oidc_token_audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
     subject_token_type = "urn:ietf:params:oauth:token-type:jwt",
-    service_account_impersonation_url = paste0(endpoints[["iamcredentials"]], "/projects/-/serviceAccounts/", service_account,":generateAccessToken"),
+    service_account_impersonation_url = paste0(endpoints[["iamcredentials"]], "/projects/-/serviceAccounts/", service_account, ":generateAccessToken"),
     # the most pragmatic way to get super$sign() to work
     # can't implement my own method without needing unexported httr functions
     # request() or build_request()
@@ -158,8 +161,8 @@ init_oauth_external_account <- function(params) {
        this time.")
     }
     subject_token <- aws_subject_token(
-     credential_source = credential_source,
-     audience = params$audience
+      credential_source = credential_source,
+      audience = params$audience
     )
     serialized_subject_token <- serialize_subject_token(subject_token)
   }
@@ -182,45 +185,59 @@ init_oauth_external_account <- function(params) {
 
 fetch_federated_access_token2 <- function(params, subject_token) {
   gargle_debug("fetch_federated_access_token2")
-authtoken <- httr::POST(
-  url = params$token_url,
-  body = list(
+  authtoken <- httr::POST(
+    url = params$token_url,
+    body = list(
       audience = paste0("//", httr::parse_url(params$oidc_token_audience)$hostname, "/", params$workload_identity_provider),
       grantType = "urn:ietf:params:oauth:grant-type:token-exchange",
       requestedTokenType = "urn:ietf:params:oauth:token-type:access_token",
       scope = paste0(params$endpoints[["www"]], "/auth/cloud-platform"),
       subjectTokenType = "urn:ietf:params:oauth:token-type:jwt",
       subjectToken = subject_token
-  ),
-  encode = "json"
-)
-gargle_debug("got response")
-print(authtoken)
-authtoken_access_token <- httr::content(authtoken)
-authtoken_access_token
+    ),
+    encode = "json"
+  )
+  gargle_debug("got response")
+  print(authtoken)
+  authtoken_access_token <- httr::content(authtoken)
+  authtoken_access_token
 }
 
 gha_subject_token <- function(params) {
-
-  # req <- list(
-  #   method = "GET",
-  #   url = params$id_token_url,
-  #   query = list(audience = params[["oidc_token_audience"]]),
-  #   token = httr::add_headers(
-  #     Authorization = paste("Bearer", params$id_token_request_token)
-  #   )  
-  # )
-  # print(req)
-  # resp <- request_make(req)
-  # print(resp)
-  # response_process(resp)$value
   gargle_debug("gha_subject_token")
-  oidcToken <- httr::GET(
-    params$id_token_url,
-    httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
-    query = list(audience = params$oidc_token_audience)
+
+  url <- params$id_token_url
+  query <- list(audience = params[["oidc_token_audience"]])
+  token_header <- httr::add_headers(Authorization = paste("Bearer", params$id_token_request_token))
+
+  req <- list(
+    method = "GET",
+    url = url,
+    query =  lapply(query, URLencode),
+    token = token_header
   )
-  gargle_debug("got response")
-  print(oidcToken)
-  httr::content(oidcToken)$value
+  print(req)
+  resp <- request_make(req)
+  print(resp)
+  response_process(resp)$value
+
+
+  # oidcToken <- httr::GET(
+  #   params$id_token_url,
+  #   httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
+  #   query = list(audience = params$oidc_token_audience)
+  # )
+  # gargle_debug("got response")
+  # print(oidcToken)
+  # httr::content(oidcToken)$value
+
+
+  # oidcToken <- httr::GET(
+  #   params$id_token_url,
+  #   httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
+  #   query = list(audience = params$oidc_token_audience)
+  # )
+  # gargle_debug("got response")
+  # print(oidcToken)
+  # httr::content(oidcToken)$value
 }
