@@ -113,7 +113,7 @@ oauth_gha_token <- function(project_id,
   hardcode_aud <- "//iam.googleapis.com/projects/1073903696751/locations/global/workloadIdentityPools/github/providers/my-repo"
 
   params <- list(
-    scopes = scopes,
+    scope = scopes,
     project_id = project_id,
     workload_identity_provider = workload_identity_provider,
     lifetime = lifetime,
@@ -173,7 +173,7 @@ init_oauth_external_account <- function(params) {
   fetch_wif_access_token(
     federated_access_token,
     impersonation_url = params[["service_account_impersonation_url"]],
-    scope = params[["scopes"]]
+    scope = params[["scope"]]
   )
 }
 
@@ -188,7 +188,6 @@ authtoken <- httr::POST(
       scope = paste0(params$endpoints[["www"]], "/auth/cloud-platform"),
       subjectTokenType = "urn:ietf:params:oauth:token-type:jwt",
       subjectToken = subject_token
-
   ),
   encode = "json"
 )
@@ -214,11 +213,11 @@ gha_subject_token <- function(params) {
   # response_process(resp)$value
   gargle_debug("gha_subject_token")
   oidcToken <- httr::GET(
-        params$id_token_url,
-        httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
-         query = list(audience = params$oidc_token_audience)
-     )
-     gargle_debug("got response")
+    params$id_token_url,
+    httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
+    query = list(audience = params$oidc_token_audience)
+  )
+  gargle_debug("got response")
   print(oidcToken)
-    httr::content(oidcToken)$value
+  httr::content(oidcToken)$value
 }
