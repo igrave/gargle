@@ -91,7 +91,6 @@ oauth_gha_token <- function(project_id,
                             service_account,
                             lifetime,
                             scopes = "https://www.googleapis.com/auth/drive.file",
-                            universe = "googleapis.com",
                             id_token_url = Sys.getenv("ACTIONS_ID_TOKEN_REQUEST_URL"),
                             id_token_request_token = Sys.getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")) {
   if (id_token_url == "" || id_token_request_token == "") {
@@ -104,34 +103,24 @@ oauth_gha_token <- function(project_id,
     ))
   }
 
-  endpoints <- c(
-    iam = "https://iam.{universe}/v1",
-    iamcredentials = "https://iamcredentials.{universe}/v1",
-    oauth2 = "https://oauth2.{universe}",
-    sts = "https://sts.{universe}/v1",
-    www = "https://www.{universe}"
-  )
-  endpoints <- sub("{universe}", universe, endpoints, fixed = TRUE)
 
   hardcode_aud <- "//iam.googleapis.com/projects/1073903696751/locations/global/workloadIdentityPools/github/providers/my-repo"
 
   params <- list(
     scopes = scopes, # this is $scopes but WifToken$new() copies it to $scope
-    project_id = project_id,
-    workload_identity_provider = workload_identity_provider,
+    # project_id = project_id,
+    # workload_identity_provider = workload_identity_provider,
     lifetime = lifetime,
-    universe = universe,
     id_token_url = id_token_url,
     id_token_request_token = id_token_request_token,
     github_actions = TRUE,
-    endpoints = endpoints,
-    service_account = service_account,
-    token_url = paste0(endpoints[["sts"]], "/token"),
-    audience = hardcode_aud,
-    # audience = paste0("//", httr::parse_url(endpoints[["iam"]])$hostname, "/", workload_identity_provider),
+    # service_account = service_account,
+    token_url = "https://sts.googleapis.com/v1/token",
+    # audience = hardcode_aud,
+    audience = paste0("//iam.googleapis.com/", workload_identity_provider),
     oidc_token_audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
     subject_token_type = "urn:ietf:params:oauth:token-type:jwt",
-    service_account_impersonation_url = paste0(endpoints[["iamcredentials"]], "/projects/-/serviceAccounts/", service_account, ":generateAccessToken"),
+    service_account_impersonation_url = paste0("https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/", service_account, ":generateAccessToken"),
     # the most pragmatic way to get super$sign() to work
     # can't implement my own method without needing unexported httr functions
     # request() or build_request()
@@ -172,9 +161,6 @@ init_oauth_external_account <- function(params) {
     params = params,
     subject_token = serialized_subject_token
   )
-
-  print("print params")
-  print(params)
 
   fetch_wif_access_token(
     federated_access_token,
