@@ -207,21 +207,25 @@ gha_subject_token <- function(params) {
   gargle_debug("gha_subject_token")
 
   url <- params$id_token_url
-  query <- list(audience = params[["oidc_token_audience"]])
+  query <- list(audience = params$oidc_token_audience)
   token_header <- httr::add_headers(Authorization = paste("Bearer", params$id_token_request_token))
 
-  # req <- list(
-  #   method = "GET",
-  #   url = url,
-  #   query =  query,
-  #   token = token_header
-  # )
-  # print(req)
-  # resp <- request_make(req)
-  # print(resp)
-  # response_process(resp)$value
+  # This doesn't seem to work
+  gargle_debug("using request_make")
+  req <- list(
+    method = "GET",
+    url = url,
+    query =  query,
+    token = token_header
+  )
+  print(req)
+  resp <- request_make(req)
+  print(resp)
+  resp_value <- response_process(resp)$value
+  str(resp_value)
 
 
+  gargle_debug("using httr::GET")
   oidcToken <- httr::GET(
     url = url,
     token_header,
@@ -229,15 +233,8 @@ gha_subject_token <- function(params) {
   )
   gargle_debug("got response")
   print(oidcToken)
-  httr::content(oidcToken)$value
+  content_value <- httr::content(oidcToken)$value
+  str(content_value)
+  content_value
 
-
-  # oidcToken <- httr::GET(
-  #   params$id_token_url,
-  #   httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
-  #   query = list(audience = params$oidc_token_audience)
-  # )
-  # gargle_debug("got response")
-  # print(oidcToken)
-  # httr::content(oidcToken)$value
 }
