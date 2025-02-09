@@ -216,5 +216,5 @@ gha_subject_token <- function(params) {
         httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
          query = list(audience = params$oidc_token_audience)
      )
-    content(oidcToken)$value
+    httr::content(oidcToken)$value
 }
