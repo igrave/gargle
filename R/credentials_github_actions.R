@@ -164,7 +164,7 @@ init_oauth_external_account <- function(params) {
   }
 
 
-  federated_access_token <- fetch_federated_access_token(
+  federated_access_token <- fetch_federated_access_token2(
     params = params,
     subject_token = serialized_subject_token
   )
@@ -176,19 +176,45 @@ init_oauth_external_account <- function(params) {
   )
 }
 
+fetch_federated_access_token2 <- function(params, subject_token) {
+  
+authtoken <- httr::POST(
+  url = params$token_url,
+  body = list(
+      audience = paste0("//", httr::parse_url(params$oidc_token_audience)$hostname, "/", params$workload_identity_provider),
+      grantType = "urn:ietf:params:oauth:grant-type:token-exchange",
+      requestedTokenType = "urn:ietf:params:oauth:token-type:access_token",
+      scope = paste0(params$endpoints[["www"]], "/auth/cloud-platform"),
+      subjectTokenType = "urn:ietf:params:oauth:token-type:jwt",
+      subjectToken = subject_token
+
+  ),
+  encode = "json"
+)
+print(authtoken)
+authtoken_access_token <- httr::content(authtoken)
+authtoken_access_token
+}
 
 gha_subject_token <- function(params) {
 
-  req <- list(
-    method = "GET",
-    url = params$id_token_url,
-    query = list(audience = params[["oidc_token_audience"]]),
-    token = httr::add_headers(
-      Authorization = paste("Bearer", params$id_token_request_token)
-    )  
-  )
-  print(req)
-  resp <- request_make(req)
-  print(resp)
-  response_process(resp)$value
+  # req <- list(
+  #   method = "GET",
+  #   url = params$id_token_url,
+  #   query = list(audience = params[["oidc_token_audience"]]),
+  #   token = httr::add_headers(
+  #     Authorization = paste("Bearer", params$id_token_request_token)
+  #   )  
+  # )
+  # print(req)
+  # resp <- request_make(req)
+  # print(resp)
+  # response_process(resp)$value
+
+  oidcToken <- httr::GET(
+        params$id_token_url,
+         add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
+         query = list(audience = params$oidc_token_audience)
+     )
+    content(oidcToken)$value
 }
