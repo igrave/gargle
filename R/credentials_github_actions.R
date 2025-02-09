@@ -168,7 +168,7 @@ init_oauth_external_account <- function(params) {
   }
 
 
-  federated_access_token <- fetch_federated_access_token2(
+  federated_access_token <- fetch_federated_access_token(
     params = params,
     subject_token = serialized_subject_token
   )
@@ -191,7 +191,7 @@ fetch_federated_access_token2 <- function(params, subject_token) {
       audience = params[["audience"]],
       grantType = "urn:ietf:params:oauth:grant-type:token-exchange",
       requestedTokenType = "urn:ietf:params:oauth:token-type:access_token",
-      scope = paste0(params$endpoints[["www"]], "/auth/cloud-platform"),
+      scope = "https://www.googleapis.com/auth/iam",
       subjectTokenType = params[["subject_token_type"]],
       subjectToken = subject_token
     ),
