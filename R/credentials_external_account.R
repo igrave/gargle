@@ -358,7 +358,7 @@ serialize_subject_token <- function(x) {
 fetch_federated_access_token <- function(params,
                                          subject_token) {
   print("fetch_federated_access_token")
-  print(req)
+
   req <- list(
     method = "POST",
     url = params$token_url,
@@ -376,6 +376,7 @@ fetch_federated_access_token <- function(params,
       subjectToken = subject_token
     )
   )
+  print(req)
   # rfc 8693 says to encode as "application/x-www-form-urlencoded"
   resp <- request_make(req, encode = "json")
   response_process(resp)
