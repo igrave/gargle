@@ -213,7 +213,7 @@ gha_subject_token <- function(params) {
 
   oidcToken <- httr::GET(
         params$id_token_url,
-         add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
+        httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
          query = list(audience = params$oidc_token_audience)
      )
     content(oidcToken)$value
