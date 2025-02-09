@@ -183,26 +183,6 @@ init_oauth_external_account <- function(params) {
   )
 }
 
-fetch_federated_access_token2 <- function(params, subject_token) {
-  gargle_debug("fetch_federated_access_token2")
-  authtoken <- httr::POST(
-    url = params$token_url,
-    body = list(
-      audience = params[["audience"]],
-      grantType = "urn:ietf:params:oauth:grant-type:token-exchange",
-      requestedTokenType = "urn:ietf:params:oauth:token-type:access_token",
-      scope = "https://www.googleapis.com/auth/iam",
-      subjectTokenType = params[["subject_token_type"]],
-      subjectToken = subject_token
-    ),
-    encode = "json"
-  )
-  gargle_debug("got response")
-  print(authtoken)
-  authtoken_access_token <- httr::content(authtoken)
-  authtoken_access_token
-}
-
 gha_subject_token <- function(params) {
   gargle_debug("gha_subject_token")
 

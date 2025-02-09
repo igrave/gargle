@@ -378,7 +378,7 @@ fetch_federated_access_token <- function(params,
   )
   print(req)
   # rfc 8693 says to encode as "application/x-www-form-urlencoded"
-  resp <- request_make(req, encode = "json")
+  resp <- request_make(req, encode = "form")
   response_process(resp)
 }
 
