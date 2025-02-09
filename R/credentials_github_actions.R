@@ -210,26 +210,26 @@ gha_subject_token <- function(params) {
   query <- list(audience = params[["oidc_token_audience"]])
   token_header <- httr::add_headers(Authorization = paste("Bearer", params$id_token_request_token))
 
-  req <- list(
-    method = "GET",
-    url = url,
-    query =  query,
-    token = token_header
-  )
-  print(req)
-  resp <- request_make(req)
-  print(resp)
-  response_process(resp)$value
-
-
-  # oidcToken <- httr::GET(
-  #   params$id_token_url,
-  #   httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
-  #   query = list(audience = params$oidc_token_audience)
+  # req <- list(
+  #   method = "GET",
+  #   url = url,
+  #   query =  query,
+  #   token = token_header
   # )
-  # gargle_debug("got response")
-  # print(oidcToken)
-  # httr::content(oidcToken)$value
+  # print(req)
+  # resp <- request_make(req)
+  # print(resp)
+  # response_process(resp)$value
+
+
+  oidcToken <- httr::GET(
+    url = url,
+    token_header,
+    query = query
+  )
+  gargle_debug("got response")
+  print(oidcToken)
+  httr::content(oidcToken)$value
 
 
   # oidcToken <- httr::GET(
