@@ -103,20 +103,13 @@ oauth_gha_token <- function(project_id,
     ))
   }
 
-
-  hardcode_aud <- "//iam.googleapis.com/projects/1073903696751/locations/global/workloadIdentityPools/github/providers/my-repo"
-
   params <- list(
     scopes = scopes, # this is $scopes but WifToken$new() copies it to $scope
-    # project_id = project_id,
-    # workload_identity_provider = workload_identity_provider,
     lifetime = lifetime,
     id_token_url = id_token_url,
     id_token_request_token = id_token_request_token,
     github_actions = TRUE,
-    # service_account = service_account,
     token_url = "https://sts.googleapis.com/v1/token",
-    # audience = hardcode_aud,
     audience = paste0("//iam.googleapis.com/", workload_identity_provider),
     oidc_token_audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
     subject_token_type = "urn:ietf:params:oauth:token-type:jwt",
@@ -156,7 +149,6 @@ init_oauth_external_account <- function(params) {
     serialized_subject_token <- serialize_subject_token(subject_token)
   }
 
-
   federated_access_token <- fetch_federated_access_token(
     params = params,
     subject_token = serialized_subject_token
@@ -165,7 +157,8 @@ init_oauth_external_account <- function(params) {
   fetch_wif_access_token(
     federated_access_token,
     impersonation_url = params[["service_account_impersonation_url"]],
-    scope = params[["scope"]]
+    scope = params[["scope"]],
+    lifetime = params[["lifetime"]]
   )
 }
 
