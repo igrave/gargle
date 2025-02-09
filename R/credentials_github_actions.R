@@ -109,6 +109,8 @@ oauth_gha_token <- function(project_id,
   )
   endpoints <- sub("{universe}", universe, endpoints, fixed = TRUE)
   
+  hardcode_aud <- "//iam.googleapis.com/projects/1073903696751/locations/global/workloadIdentityPools/github/providers/my-repo"
+
   params <- list(
     scopes = scopes,
     project_id = project_id,
@@ -121,7 +123,8 @@ oauth_gha_token <- function(project_id,
     endpoints = endpoints,
     service_account = service_account,
     token_url = paste0(endpoints[["sts"]], "/token"),
-    audience = paste0("//", httr::parse_url(endpoints[["iam"]])$hostname, "/", workload_identity_provider),
+    audience = hardcode_aud, 
+    # audience = paste0("//", httr::parse_url(endpoints[["iam"]])$hostname, "/", workload_identity_provider),
     oidc_token_audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
     subject_token_type = "urn:ietf:params:oauth:token-type:jwt",
     impersonation_url = paste0(endpoints[["iamcredentials"]], "/projects/-/serviceAccounts/", service_account,":generateAccessToken"),
@@ -184,7 +187,8 @@ gha_subject_token <- function(params) {
       Authorization = paste("Bearer", params$id_token_request_token)
     )  
   )
-  
+  print(req)
   resp <- request_make(req)
+  print(resp)
   response_process(resp)$value
 }
