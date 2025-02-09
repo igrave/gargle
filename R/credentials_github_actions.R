@@ -206,35 +206,12 @@ fetch_federated_access_token2 <- function(params, subject_token) {
 gha_subject_token <- function(params) {
   gargle_debug("gha_subject_token")
 
-  url <- params$id_token_url
-  query <- list(audience = params$oidc_token_audience)
-  token_header <- httr::add_headers(Authorization = paste("Bearer", params$id_token_request_token))
-
-  # This doesn't seem to work
-  gargle_debug("using request_make")
   req <- list(
     method = "GET",
-    url = url,
-    query =  query,
-    token = token_header
+    url = params[["id_token_url"]],
+    token = httr::add_headers(Authorization = paste("Bearer", params$id_token_request_token))
   )
-  print(req)
-  resp <- request_make(req)
-  print(resp)
-  resp_value <- response_process(resp)$value
-  str(resp_value)
-
-
-  gargle_debug("using httr::GET")
-  oidcToken <- httr::GET(
-    url = url,
-    token_header,
-    query = query
-  )
-  gargle_debug("got response")
-  print(oidcToken)
-  content_value <- httr::content(oidcToken)$value
-  str(content_value)
-  content_value
-
+  query_audience <- list(audience = params$oidc_token_audience)
+  resp <- request_make(req, query = query_audience)
+  response_process(resp)$value
 }
