@@ -8,7 +8,7 @@ credentials_github_actions(
   project_id,
   workload_identity_provider,
   service_account,
-  lifetime,
+  lifetime = "300s",
   scopes = "https://www.googleapis.com/auth/drive.file",
   ...
 )
@@ -31,23 +31,6 @@ A \code{\link[=WifToken]{WifToken()}} or \code{NULL}.
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
-Workload identity federation is a new (as of April 2021) keyless
-authentication mechanism that allows applications running on a non-Google
-Cloud platform, such as Github Actions, to access Google Cloud resources without using a
-conventional service account token. This eliminates the need to
-safely manage service account credential files.
-
-Unlike service accounts, the configuration file for workload identity
-federation contains no secrets. Instead, it holds non-sensitive metadata.
-The external application obtains the needed sensitive data "on-the-fly" from
-the running instance. The combined data is then used to obtain a so-called
-subject token from the external identity provider, such as AWS. This is then
-sent to Google's Security Token Service API, in exchange for a very
-short-lived federated access token. Finally, the federated access token is
-sent to Google's Service Account Credentials API, in exchange for a
-short-lived GCP access token. This access token allows the external
-application to impersonate a service account and inherit the permissions of
-the service account to access GCP resources.
 }
 \examples{
 \dontrun{

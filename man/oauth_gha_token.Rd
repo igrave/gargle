@@ -10,7 +10,6 @@ oauth_gha_token(
   service_account,
   lifetime,
   scopes = "https://www.googleapis.com/auth/drive.file",
-  universe = "googleapis.com",
   id_token_url = Sys.getenv("ACTIONS_ID_TOKEN_REQUEST_URL"),
   id_token_request_token = Sys.getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
 )

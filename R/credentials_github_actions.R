@@ -3,26 +3,6 @@
 #' @description
 
 #' `r lifecycle::badge('experimental')`
-
-#' Workload identity federation is a new (as of April 2021) keyless
-#' authentication mechanism that allows applications running on a non-Google
-#' Cloud platform, such as Github Actions, to access Google Cloud resources without using a
-#' conventional service account token. This eliminates the need to
-#' safely manage service account credential files.
-#'
-
-#'  Unlike service accounts, the configuration file for workload identity
-#'  federation contains no secrets. Instead, it holds non-sensitive metadata.
-#'  The external application obtains the needed sensitive data "on-the-fly" from
-#'  the running instance. The combined data is then used to obtain a so-called
-#'  subject token from the external identity provider, such as AWS. This is then
-#'  sent to Google's Security Token Service API, in exchange for a very
-#'  short-lived federated access token. Finally, the federated access token is
-#'  sent to Google's Service Account Credentials API, in exchange for a
-#'  short-lived GCP access token. This access token allows the external
-#'  application to impersonate a service account and inherit the permissions of
-#'  the service account to access GCP resources.
-
 #'
 #' @inheritParams token_fetch
 
@@ -112,7 +92,12 @@ oauth_gha_token <- function(project_id,
     audience = paste0("//iam.googleapis.com/", workload_identity_provider),
     oidc_token_audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
     subject_token_type = "urn:ietf:params:oauth:token-type:jwt",
-    service_account_impersonation_url = paste0("https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/", service_account, ":generateAccessToken")
+    service_account_impersonation_url = paste0(
+      "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/",
+       service_account, 
+       ":generateAccessToken"
+      ),
+      as_header = TRUE
   )
   WifToken$new(params = params)
 }
@@ -122,8 +107,7 @@ detect_github_actions <- function() {
   if (Sys.getenv("GITHUB_ACTIONS") == "true") {
     return(TRUE)
   }
-  gargle_debug("
-    Environment variable GITHUB_ACTIONS is not 'true'")
+  gargle_debug("Environment variable GITHUB_ACTIONS is not 'true'")
   FALSE
 }
 
