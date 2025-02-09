@@ -397,6 +397,8 @@ fetch_wif_access_token <- function(federated_access_token,
       Authorization = paste("Bearer", federated_access_token$access_token)
     )
   )
+  print("fetch_wif_token")
+  print(req)
   resp <- request_make(req)
   response_process(resp)
 }

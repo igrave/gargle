@@ -172,7 +172,7 @@ init_oauth_external_account <- function(params) {
   fetch_wif_access_token(
     federated_access_token,
     impersonation_url = params[["service_account_impersonation_url"]],
-    scope = params[["scope"]]
+    scope = params[["scopes"]]
   )
 }
 
