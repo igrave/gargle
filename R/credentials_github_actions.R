@@ -127,7 +127,7 @@ oauth_gha_token <- function(project_id,
     # audience = paste0("//", httr::parse_url(endpoints[["iam"]])$hostname, "/", workload_identity_provider),
     oidc_token_audience = paste0("https://iam.googleapis.com/", workload_identity_provider),
     subject_token_type = "urn:ietf:params:oauth:token-type:jwt",
-    impersonation_url = paste0(endpoints[["iamcredentials"]], "/projects/-/serviceAccounts/", service_account,":generateAccessToken"),
+    service_account_impersonation_url = paste0(endpoints[["iamcredentials"]], "/projects/-/serviceAccounts/", service_account,":generateAccessToken"),
     # the most pragmatic way to get super$sign() to work
     # can't implement my own method without needing unexported httr functions
     # request() or build_request()
@@ -177,7 +177,7 @@ init_oauth_external_account <- function(params) {
 }
 
 fetch_federated_access_token2 <- function(params, subject_token) {
-  
+  gargle_debug("fetch_federated_access_token2")
 authtoken <- httr::POST(
   url = params$token_url,
   body = list(
@@ -191,6 +191,7 @@ authtoken <- httr::POST(
   ),
   encode = "json"
 )
+gargle_debug("got response")
 print(authtoken)
 authtoken_access_token <- httr::content(authtoken)
 authtoken_access_token
@@ -210,11 +211,13 @@ gha_subject_token <- function(params) {
   # resp <- request_make(req)
   # print(resp)
   # response_process(resp)$value
-
+  gargle_debug("gha_subject_token")
   oidcToken <- httr::GET(
         params$id_token_url,
         httr::add_headers(Authorization = paste0("Bearer ", params$id_token_request_token)),
          query = list(audience = params$oidc_token_audience)
      )
+     gargle_debug("got response")
+  print(oidcToken)
     httr::content(oidcToken)$value
 }
