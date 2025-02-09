@@ -400,5 +400,6 @@ fetch_wif_access_token <- function(federated_access_token,
   print("fetch_wif_token")
   print(req)
   resp <- request_make(req)
+  print(resp)
   response_process(resp)
 }

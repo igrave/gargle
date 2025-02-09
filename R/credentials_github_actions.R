@@ -57,7 +57,8 @@ credentials_github_actions <- function(project_id,
     return(NULL)
   }
 
-  scopes <- normalize_scopes(scopes)
+  scopes <- normalize_scopes(add_email_scope(scopes))
+
 
   token <- oauth_gha_token(
     project_id = project_id,
