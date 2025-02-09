@@ -227,34 +227,34 @@ detect_aws_ec2 <- function() {
   FALSE
 }
 
-init_oauth_external_account <- function(params) {
-  if (params$github_actions) {
-    serialized_subject_token <- gha_subject_token(params)
-  } else {
-    credential_source <- params$credential_source
-    if (!identical(credential_source$environment_id, "aws1")) {
-      gargle_abort("
-       {.pkg gargle}'s workload identity federation flow only supports AWS at \\
-       this time.")
-    }
-    subject_token <- aws_subject_token(
-     credential_source = credential_source,
-     audience = params$audience
-    )
-    serialized_subject_token <- serialize_subject_token(subject_token)
-  }
-  
-  federated_access_token <- fetch_federated_access_token(
-    params = params,
-    subject_token = serialized_subject_token
-  )
+# init_oauth_external_account <- function(params) {
+#   if (params$github_actions) {
+#     serialized_subject_token <- gha_subject_token(params)
+#   } else {
+#     credential_source <- params$credential_source
+#     if (!identical(credential_source$environment_id, "aws1")) {
+#       gargle_abort("
+#        {.pkg gargle}'s workload identity federation flow only supports AWS at \\
+#        this time.")
+#     }
+#     subject_token <- aws_subject_token(
+#      credential_source = credential_source,
+#      audience = params$audience
+#     )
+#     serialized_subject_token <- serialize_subject_token(subject_token)
+#   }
 
-  fetch_wif_access_token(
-    federated_access_token,
-    impersonation_url = params[["service_account_impersonation_url"]],
-    scope = params[["scope"]]
-  )
-}
+#   federated_access_token <- fetch_federated_access_token(
+#     params = params,
+#     subject_token = serialized_subject_token
+#   )
+
+#   fetch_wif_access_token(
+#     federated_access_token,
+#     impersonation_url = params[["service_account_impersonation_url"]],
+#     scope = params[["scope"]]
+#   )
+# }
 
 # For AWS, the subject token isn't really a token, but rather the instructions
 # necessary to get a token:
@@ -375,7 +375,7 @@ fetch_federated_access_token <- function(params,
     )
   )
   # rfc 8693 says to encode as "application/x-www-form-urlencoded"
-  resp <- request_make(req, encode = "form")
+  resp <- request_make(req, encode = "json")
   response_process(resp)
 }
 
